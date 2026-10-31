@@ -2806,6 +2806,34 @@ else boot();
 <script>
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(function(){}); }
 </script>
+
+<div id="installFab" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9999;
+  background:#2F5D50;color:#fff;border:none;border-radius:999px;padding:13px 26px;font-size:15px;font-weight:600;
+  box-shadow:0 10px 28px rgba(0,0,0,.28);font-family:inherit;">安装到桌面</div>
+<script>
+(function(){
+  var fab = document.getElementById('installFab');
+  var ua = navigator.userAgent;
+  var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (isStandalone) return;
+  if (isIOS) {
+    fab.textContent = '点底部「分享」→ 添加到主屏幕';
+    fab.style.display = 'block';
+    setTimeout(function(){ fab.style.display = 'none'; }, 12000);
+    return;
+  }
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred = e; fab.style.display = 'block';
+  });
+  fab.addEventListener('click', function(){
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function(){ fab.style.display = 'none'; });
+  });
+})();
+</script>
 </body>
 </html>
 </script>
